@@ -70,7 +70,32 @@ function openModal(){document.getElementById('date').value=new Date().toISOStrin
 function closeModal(){document.getElementById('modal').style.display='none'}
 function addTransaction(){let desc=document.getElementById('desc').value.trim(),amount=Number(document.getElementById('amountInput').value),date=document.getElementById('date').value;if(!desc||amount<=0||!date){alert('Please enter a description, valid amount and date.');return}tx.push({id:Date.now(),type:document.getElementById('type').value,desc,amount,category:document.getElementById('category').value,date});save();render();closeModal();document.getElementById('desc').value='';document.getElementById('amountInput').value=''}
 function removeTx(id){if(confirm('Delete this transaction?')){tx=tx.filter(t=>t.id!==id);save();render()}}
-function showPage(name,el){document.getElementById('pageTitle').textContent=name;document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));el.classList.add('active');if(name!=='Dashboard')alert(name+' view: use the dashboard transactions and budget panels for this demo.')}
+function showPage(name,el){
+  document.getElementById('pageTitle').textContent=name;
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  const cards=document.querySelector('.cards'), charts=document.querySelector('.charts'), bottom=document.querySelector('.bottom');
+  const txPanel=bottom.children[0], budgetPanel=bottom.children[1];
+  // Reset layout before applying the selected view.
+  cards.style.display='grid'; charts.style.display='grid'; bottom.style.display='grid';
+  txPanel.style.display='block'; budgetPanel.style.display='block';
+  txPanel.style.gridColumn=''; budgetPanel.style.gridColumn='';
+  if(name==='Transactions'){
+    cards.style.display='none'; charts.style.display='none';
+    bottom.style.gridTemplateColumns='1fr'; budgetPanel.style.display='none';
+    txPanel.style.gridColumn='1 / -1';
+  } else if(name==='Budgets'){
+    charts.style.display='none'; txPanel.style.display='none';
+    bottom.style.gridTemplateColumns='1fr'; budgetPanel.style.gridColumn='1 / -1';
+    budgetPanel.querySelector('.panelhead small').textContent='Category spending limits';
+  } else if(name==='Analytics'){
+    bottom.style.display='none'; cards.style.display='none';
+    charts.style.gridTemplateColumns='1fr 1fr';
+  } else {
+    bottom.style.gridTemplateColumns='1.55fr 1fr';
+    budgetPanel.querySelector('.panelhead small').textContent='Spending limits';
+  }
+}
 render();
 </script>
 </body></html>
